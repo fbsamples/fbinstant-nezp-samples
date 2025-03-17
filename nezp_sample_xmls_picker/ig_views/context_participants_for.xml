@@ -1,0 +1,8 @@
+<View>
+    <For source="{{FBInstant.context.participants}}" itemName="i" sortKey="name">
+        <View>
+            <Image src="{{i.photo}}" />
+            <Text content="{{i.name}}" />
+        </View>
+    </For>
+</View>

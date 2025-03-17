@@ -1,0 +1,250 @@
+html,
+body,
+#game {
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    margin-top: 2px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.header {
+    align-items: center;
+    display: flex;
+    height: 10%;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  }
+
+.profilePicture {
+    border: 3px solid #07405c;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 80px;
+    margin-right: 20px;
+    width: 80px; /* Blue border color */
+}
+.playerName {
+  font-family: "Sobread";
+  font-size: 14px;
+}
+
+ img {
+    align-self: center;
+    display: flex;
+    width: 10%;
+  }
+
+  @font-face {
+    font-family: "Sobread";
+    src: url("Sobread.ttf");
+  }
+
+  .versusDisplay {
+    /* background-color:#6AAA64; */
+    align-items: center;
+    align-self: center;
+    color: #07405c;
+    cursor: auto;
+    display: flex;
+    font-family: "Sobread";
+
+    font-size: 32px;
+    margin-top: 150px;
+    padding: 2px;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .versusDisplay > :first-child {
+    margin-right: 25px;
+  }
+
+  .divText {
+    align-self: center;
+    color: #07405c;
+    cursor: auto;
+    display: flex;
+    font-family: "Sobread";
+    font-size: 72px;
+    margin-top: 10px;
+    padding: 2px;
+  }
+
+  .button {
+    background-color: #125E8A;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Sobread";
+    outline: none;
+    text-align: center;
+    text-decoration: none;
+
+  }
+
+  #play-with-friends {
+    border-radius: 50px;
+    font-size: 32px;
+    height: 75px;
+    padding: 15px 25px;
+    width: 400px;
+  }
+
+  #back-button {
+    border-radius: 25px;
+    display: none;
+    font-size: 24px;
+    height: 50px;
+    padding: 15px 25px;
+    width: 100px;
+  }
+
+  .button:hover {background-color: #07405c}
+
+  .playWithFriendsDiv {
+    align-self: center;
+    display: flex;
+    position: absolute;
+    top: 250px;
+    z-index: 1;
+  }
+
+  .backButtonDiv {
+    align-self: center;
+    display: flex;
+    margin-left: -300px;
+    position: absolute;
+    top: 100px;
+    z-index: 1;
+  }
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+#board {
+    display: none;
+    flex-wrap: wrap;
+    height: 420px;
+    margin: 0 auto;
+    margin-top: 250px;
+    width: 350px;
+}
+
+.tile {
+    /* Box */
+    align-items: center;
+    border: 2px solid #07405c;
+    color: black;
+    display: flex;
+    font-size: 36px;
+    font-weight: bold;
+    height: 60px;
+    justify-content: center;
+    margin: 2.5px;
+    width: 60px;
+
+    /* Text */
+}
+
+#versusboard {
+    background-color: #6AAA64;
+    display: none;
+    flex-wrap: wrap;
+    height: 100px;
+    margin: 0 auto;
+    margin-top: 250px;
+    width: 200px;
+}
+
+.versustile {
+    /* Box */
+    align-items: center;
+    border: 2px solid #07405c;
+    display: flex;
+    height: 10px;
+    justify-content: center;
+    margin: 1.5px;
+    width: 10px;
+}
+
+.correct {
+    background-color: #6AAA64;
+    border-color: white;
+    color: white;
+}
+
+.present {
+    background-color: #C9B458;
+    border-color: white;
+    color: white;
+}
+
+.absent {
+    background-color: #787C7E;
+    border-color:white;
+    color: white;
+}
+
+.keyboard-row {
+    display: none;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    width: 400px;
+}
+
+.key-tile {
+    align-items: center;
+    border: 1px solid lightgray;
+    display: flex;
+    font-size: 20px;
+    font-weight: bold;
+    height: 40px;
+    justify-content: center;
+    margin: 1px;
+    width: 36px;
+
+    /* Text */
+}
+
+.enter-key-tile {
+    align-items: center;
+    border: 1px solid lightgray;
+    display: flex;
+    font-size: 20px;
+    font-weight: bold;
+    height: 40px;
+    justify-content: center;
+    margin: 1px;
+    width: 76px;
+
+    /* Text */
+}
+
+.overlayControl{
+  left: 50px;
+  position: absolute;
+  text-align: left;
+  bottom: 50px;
+  z-index: 99;
+}
+
+.overlayOutput{
+  top: 10px;
+  position: absolute;
+  text-align: left;
+  left: 10px;
+  z-index: 99;
+}

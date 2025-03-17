@@ -1,0 +1,12 @@
+<View>
+    <View>
+        <Image className="profilePicture" width="50"  src="{{FBInstant.player.photo}}"/>
+    </View>
+    <If>
+        <Condition lhs="{{FBInstant.player.name}}" operator="EQUALS" rhs="Daiwei"/>
+            <View><Text className="playerName" content="{{FBInstant.player.name}} - in IF!"/></View>
+        <Else>
+            <View><Text className="playerName" content="{{FBInstant.player.name}} - in ELSE!"/></View>
+        </Else>
+    </If>
+</View>

@@ -1,0 +1,19 @@
+<View>
+    <If>
+        <ConditionGroup operator="AND">
+            <Condition lhs="weekly" operator="IN" rhs="{{finishedChallenges}}"/>
+            <Condition lhs="daily" operator="IN" rhs="{{finishedChallenges}}"/>
+        </ConditionGroup>
+        <View><Text className="playerName" content="You finished the weekly and daily challenge"/></View>
+        <ElseIf>
+            <ConditionGroup operator="OR">
+                <Condition lhs="weekly" operator="IN" rhs="{{finishedChallenges}}"/>
+                <Condition lhs="daily" operator="IN" rhs="{{finishedChallenges}}"/>
+            </ConditionGroup>
+            <View><Text className="playerName" content="You finished 1 out of 2 challenges"/></View>
+        </ElseIf>
+        <Else>
+            <View><Text className="playerName" content="You still need to finish your challenges"/></View>
+        </Else>
+    </If>
+</View>

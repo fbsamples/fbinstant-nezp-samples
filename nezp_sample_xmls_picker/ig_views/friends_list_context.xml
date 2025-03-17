@@ -1,0 +1,9 @@
+<View>
+    <For source="{{FBInstant.player.connectedPlayers}}" itemName="i" sortKey="name">
+        <View>
+            <Image src="{{i.photo}}" />
+            <Text content="{{i.name}}" />
+            <Button action="{{FBInstant.action.contextCreate({{i.id}})}}" content="Play now - create" />
+        </View>
+    </For>
+</View>

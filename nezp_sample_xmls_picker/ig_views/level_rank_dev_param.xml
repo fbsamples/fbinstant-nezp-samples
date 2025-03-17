@@ -1,0 +1,3 @@
+<View>
+    <Text content="Current level: {{currentLevel}}, Rank: {{rank}}" className="playerName"/>
+</View>

@@ -1,0 +1,3 @@
+<View>
+    <Text content="Context ID: {{FBInstant.context.id}}" className="playerName"/>
+</View>

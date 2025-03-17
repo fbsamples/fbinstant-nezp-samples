@@ -1,0 +1,7 @@
+<View>
+    <For source="{{challenges}}" itemName="i">
+        <View>
+            <Text content="{{i.index}} {{i.item}}" />
+        </View>
+    </For>
+</View>

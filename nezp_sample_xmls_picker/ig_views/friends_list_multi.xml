@@ -1,0 +1,22 @@
+<View>
+    <For source="{{FBInstant.player.connectedPlayers}}" itemName="i" sortKey="name">
+        <View>
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+            <Image className="profilePicture"  src="{{i.photo}}" />
+            <Text  className="playerName" content="{{i.name}}" />
+        </View>
+    </For>
+</View>

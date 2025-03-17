@@ -1,0 +1,4 @@
+<View>
+    <Image src="{{FBInstant.player.friends[{{playerID}}].photo}}" />
+    <Text content="{{FBInstant.player.friends[{{playerID}}].name}}" />
+</View>

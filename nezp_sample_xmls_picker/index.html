@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="worduel.css">
+  <script src="https://connect.facebook.net/en_US/fbinstant.restricted.latest.js"></script>
+  <script src="main.js" type="module"></script>
+  <title>Worduel</title>
+</head>
+
+<body>
+  <div id="game">
+    <div class="header">
+      <div class='divText'>
+        <b>Worduel!</b>
+      </div>
+    </div>
+    <div class="backButtonDiv">
+      <button type="button" class="button" id="back-button">Back</button>
+    </div>
+    <div class="overlayControl">
+      <text>Overlay XML Content:</text>
+      <br />
+      <textarea type="text" id="overlay_content_editor" name="overlay_content_editor" rows="10"></textarea>
+      <br />
+      <text>Current Active Overlay: </text>
+      <select id ="overlay_selection" name="overlay_selection" >
+        <option value='ig_views/profile_view.xml' selected="selected">Profile Overlay</option>
+        <option value='ig_views/profile_view_if.xml'>Profile IF Overlay</option>
+        <option value='ig_views/friends_list_for.xml'>Friend List - For</option>
+        <option value='ig_views/friends_list_multi.xml'>Friend List - Multi</option>
+        <option value='ig_views/friends_list_context.xml'>Friend List - For/Create</option>
+        <option value='ig_views/specific_friend.xml'>Specific Friend</option>
+        <option value='ig_views/context_participants_for.xml'>Context Participants - For</option>
+        <option value='ig_views/open_contexts.xml'>Open Contexts - For/Switch</option>
+        <option value='ig_views/player_id.xml'>Player ID - Local</option>
+        <option value='ig_views/context_id.xml'>Context ID - Local</option>
+        <option value='ig_views/challenges_loop.xml'>Challenges - Dev Param Loop</option>
+        <option value='ig_views/level_rank_dev_param.xml'>Current Level/Rank - Dev Param String/Num</option>
+        <option value='ig_views/level_rank_if.xml'>Player Stats - IF String/Num</option>
+        <option value='ig_views/challenges_left_if.xml'>Challenges Remaining - IF IN</option>
+        <option value='ig_views/leaderboard_list.xml'>Leaderboard List</option>
+      </select>
+      <br />
+      <text>Overlay Status: <span id="current_overlay_status"></span></text>
+      <br />
+      <text>Dev Params:</text>
+      <br />
+      <textarea type="text" id="overlay_dev_params" name="overlay_dev_params" rows="5"></textarea>
+      <br />
+      <text>Overlay Control: </text>
+      <button type="button" class="button" id="overlay-control-button">Load Overlay</button>
+      <button type="button" class="button" display="none" id="overlay-control-button-update">Update Overlay</button>
+      <br />
+      <text>Overlay Special Effect: </text><button type="button" class="button" id="rotate">Rotate</button> <button
+        type="button" class="button" id="scale">Scale</button> <button type="button" class="button"
+        id="fade">Fade</button>
+      <text>IAP Control: </text>
+        <div id="game-iap">
+          <button class="testButton" id="showStore">Show Store</button>
+          <div id="storeContainer" style="overflow: auto;"></div>
+          <button class="testButton" id="showPurchases">Show Purchases</button>
+          <div id="historyContainer" style="overflow: auto;"></div>
+          <div id="spacer"></div>
+        </div>
+        <div id="storeContainer"></div>
+        <div id="historyContainer"></div>
+    </div>
+    <div class="overlayOutput">
+      <p>Overlay Custom Event: <span id="overlayCustomEventOutput"></span></p>
+      <p>Overlay Context Response: <span id="overlayContextResponse"></span></p>
+    </div>
+    <div id="board">
+    </div>
+    <br>
+    <h1 id="answer" style="visibility: hidden;"></h1>
+  </div>
+</body>
+
+</html>

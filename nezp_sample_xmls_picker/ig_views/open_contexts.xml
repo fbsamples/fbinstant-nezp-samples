@@ -1,0 +1,7 @@
+<View>
+    <For source="{{contextIDs}}" itemName="i">
+        <View>
+            <Button action="{{FBInstant.action.switchContext({{i.item}})}}" content="Play now - switch into context {{i.item}}" />
+        </View>
+    </For>
+</View>

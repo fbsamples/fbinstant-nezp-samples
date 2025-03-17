@@ -1,0 +1,3 @@
+<View>
+    <Text content="Player ID: {{FBInstant.player.id}}" className="playerName"/>
+</View>

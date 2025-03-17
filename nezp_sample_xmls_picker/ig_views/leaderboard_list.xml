@@ -1,0 +1,33 @@
+<View className="image-column">
+    <For source="{{players}}" itemName="i" sortKey="score">
+        <If>
+        <Condition lhs="{{i.name}}" operator="EQUALS" rhs="currentPlayer" />
+            <View className="image-container">
+                <Image src="ig_views/button_rectangle_flat.png" style="height:100px; width:400px;" className="image"/>
+                <View className="image-elements">
+                    <Image src="{{FBInstant.player.photo}}" style="width:60px; height:60px;" className="profilePicture"/>
+                    <View className="text-container">
+                        <Text content="{{FBInstant.player.name}}" className="name-text"/>
+                        <Text content="{{i.score}}" className="score-text"/>
+                        <View className="button-div" onTapEvent="share">
+                            <Image className="button-image" src="ig_views/2.png"/>
+                            <Text className="button-text" content="Share"/>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        <Else>
+                <View className="image-container">
+                    <Image src="ig_views/button_rectangle_line.png" style="height:100px; width:400px;" className="image"/>
+                    <View className="image-elements">
+                        <Image src="icons/an{{i.index}}.png" style="width:60px; height:60px;" className="profilePicture"/>
+                        <View className="text-container">
+                            <Text content="{{i.name}}" className="name-text" />
+                            <Text content="{{i.score}}" className="score-text"/>
+                        </View>
+                    </View>
+                </View>
+        </Else>
+        </If>
+    </For>
+</View>

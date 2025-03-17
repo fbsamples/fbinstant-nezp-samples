@@ -1,0 +1,114 @@
+.header {
+  align-items: center;
+  display: flex;
+  height: 10%;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.profilePicture {
+  border: 3px solid #07405c;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 80px;
+  margin-right: 20px;
+  width: 80px; /* Blue border color */
+}
+
+.playerName {
+  font-family: "Sobread";
+  font-size: 14px;
+}
+
+.image-column {
+  display: flex;
+  flex-direction: column;
+  /* gap: 20px;  */
+  align-items: center;
+}
+
+.image-row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.image-container {
+  position: relative;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.image-elements {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  /* transform: translate(-50%, -50%); */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.name-text {
+  color: rgb(37, 37, 111);
+  font-size: 22px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  font-family: "Sobread";
+  border-radius: 5px;
+}
+
+.score-text {
+  color: white;
+  font-size: 20px;
+  text-shadow:
+    -1px -1px 0 red,
+    1px -1px 0 red,
+    -1px 1px 0 red,
+    1px 1px 0 red;
+  padding: 10px;
+  font-weight: bold;
+  font-family: "Sobread";
+}
+
+.button-div {
+  position: absolute;
+  font-size: 16px;
+  cursor: pointer;
+  right: -90px;
+}
+
+.button-image {
+  width: 80px;
+  height: 60px;
+}
+
+.button-text {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  color: white;
+  font-family: "Sobread";
+}
+
+@font-face {
+  font-family: "Sobread";
+  src: url("Sobread.ttf");
+}

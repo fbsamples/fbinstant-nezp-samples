@@ -1,0 +1,24 @@
+<View>
+    <View><Text className="playerName" content="Player Stats"/></View>
+    <If>
+        <Condition lhs="{{rank}}" operator="LESS_THAN" rhs="4"/>
+            <View><Text className="playerName" content="You are in the top 3"/></View>
+        <Else>
+            <View><Text className="playerName" content="You are almost in the top 3, keep trying"/></View>
+        </Else>
+    </If>
+    <If>
+        <Condition lhs="{{rankName}}" operator="EQUALS" rhs="King"/>
+            <View><Text className="playerName" content="Rank is king"/></View>
+        <Else>
+            <View><Text className="playerName" content="Rank is pawn"/></View>
+        </Else>
+    </If>
+    <If>
+        <Condition lhs="{{progress}}" operator="GREATER_THAN" rhs="90"/>
+            <View><Text className="playerName" content="You are over 90% of the way there"/></View>
+        <Else>
+            <View><Text className="playerName" content="Keep on playing, still under 90%"/></View>
+        </Else>
+    </If>
+</View>
