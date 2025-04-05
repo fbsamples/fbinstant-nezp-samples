@@ -1,6 +1,6 @@
 # Network Enabled Zero Permissions
 
-TBD
+This is a collection of sample apps to demonstrate different use cases for Network Enabled Zero Permissions. More details available here: https://developers.facebook.com/docs/games/build/instant-games/network-enabled-zero-permissions/overview
 
 ## License
 
