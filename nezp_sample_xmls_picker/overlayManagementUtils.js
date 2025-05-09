@@ -105,6 +105,28 @@ export async function setOverlayDevParams(overlayName) {
     const playerID =
       connectedPlayers.length > 0 ? connectedPlayers[0].getID() : 'REPLACE-ME';
     devParams = {playerID};
+  } else if (overlayName === 'ig_views/dynamic_key.xml') {
+    devParams = {
+      players: [
+        {
+          id: 1,
+          name: 'Alice',
+        },
+        {
+          id: 2,
+          name: 'Bob',
+        },
+        {
+          id: 3,
+          name: 'Carol',
+        },
+      ],
+      scores: {
+        '1': 101,
+        '2': 222,
+        '3': 313,
+      },
+    };
   } else {
     document.getElementById('overlay_dev_params').value = devParams;
     return;

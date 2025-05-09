@@ -1,0 +1,8 @@
+<View>
+  <For source="{{players}}" itemName="player" sortKey="{{scores[{{player.id}}]}}" order="DESC">
+    <View>
+        <Text content="{{player.name}}" />
+        <Text content="{{scores[{{player.id}}]}}" />
+     </View>
+  </For>
+</View>
