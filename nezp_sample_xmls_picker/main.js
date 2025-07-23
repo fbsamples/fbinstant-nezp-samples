@@ -90,6 +90,19 @@ window.addEventListener('DOMContentLoaded', function () {
           document.getElementById('historyContainer').style.display = 'none';
         }
       });
+
+      document.getElementById('showAvatarExpressions').addEventListener('click', () => {
+        if (
+          document.getElementById('avatarExpressionContainer').style.display == '' ||
+          document.getElementById('avatarExpressionContainer').style.display === 'none'
+        ) {
+          document.getElementById('avatarExpressionContainer').innerHTML = '';
+          document.getElementById('avatarExpressionContainer').style.display = 'flex';
+          showAvatarExpressions();
+        } else {
+          document.getElementById('avatarExpressionContainer').style.display = 'none';
+        }
+      });
     });
   });
 
@@ -291,6 +304,32 @@ window.addEventListener('DOMContentLoaded', function () {
       .catch(function (error) {
         console.log('getPurchasesAsync error', error);
       });
+  }
+
+  function showAvatarExpressions() {
+    const values = Object.values(FBInstant.avatarExpressions.AvatarExpressionEnums);
+    const randomIndex = Math.floor(Math.random() * values.length);
+    const randomTemplate = values[randomIndex];
+
+    FBInstant.avatarExpressions.getAvatarExpressionsAsync([
+      randomTemplate
+    ]).then(function (uri_by_template) {
+      console.log("Avatar expression URI fetched:", uri_by_template);
+      const uri = uri_by_template.get(randomTemplate);
+      if (uri == null) {
+        console.log('Avatar expression not fetched');
+        return;
+      }
+
+      const img = document.createElement("img");
+      img.src = uri;
+      img.width = 200;
+      img.height = 200;
+      img.style = 'width: 100%; height: auto; object-fit: contain;';
+      document.getElementById('avatarExpressionContainer').appendChild(img);
+    }).catch(function (error) {
+      console.log('getAvatarExpressionsAsync error', error);
+    });
   }
 
   function getPurchaseDetails(item, index) {
