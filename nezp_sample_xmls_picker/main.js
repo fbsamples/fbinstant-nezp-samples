@@ -50,9 +50,11 @@ window.addEventListener('DOMContentLoaded', function () {
       document.getElementById('overlay_dev_params').value =
         '{"players":[{"name":"Zebra","score":100},{"name":"Lion","score":200},{"name":"Pig","score":300},{"name":"currentPlayer","score":250},{"name":"Frog", "score":500},{"name":"Hippo", "score":600},{"name":"Cat", "score":600}]}';
 
-      FBInstant.onContextChange(contextID => {
+      FBInstant.onContextChange((contextID, selectedPlayerID) => {
         document.getElementById('overlayContextResponse').innerHTML +=
-          ' ' + contextID;
+          ' ' +
+          contextID +
+          (selectedPlayerID != null ? ' (with ' + selectedPlayerID + ')' : '');
         FBInstant.player.getDataAsync(['contextIDs']).then(data => {
           const existingContextIDs = Array.isArray(data.contextIDs)
             ? data.contextIDs

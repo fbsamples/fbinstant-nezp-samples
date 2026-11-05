@@ -68,6 +68,19 @@ function updateOverlayButtonToNextStep(nextStepContent) {
   document.getElementById('overlay-control-button').innerHTML = nextStepContent;
 }
 
+// Unavailable and empty both mean there is nothing to show; a real game would
+// hide its friends section.
+async function getFriendMatchCandidates() {
+  try {
+    // eslint-disable-next-line no-undef
+    const ids = await FBInstant.getFriendMatchCandidatesAsync();
+    return ids.map(id => ({id}));
+  } catch (error) {
+    console.log('getFriendMatchCandidatesAsync error', error);
+    return [];
+  }
+}
+
 export async function setOverlayDevParams(overlayName) {
   let devParams = document.getElementById('overlay_dev_params').value;
   if (overlayName === 'ig_views/challenges_loop.xml') {
@@ -105,6 +118,8 @@ export async function setOverlayDevParams(overlayName) {
     const playerID =
       connectedPlayers.length > 0 ? connectedPlayers[0].getID() : 'REPLACE-ME';
     devParams = {playerID};
+  } else if (overlayName === 'ig_views/friend_match.xml') {
+    devParams = {candidates: await getFriendMatchCandidates()};
   } else if (overlayName === 'ig_views/dynamic_key.xml') {
     devParams = {
       players: [
