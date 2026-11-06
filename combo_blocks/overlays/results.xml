@@ -1,0 +1,33 @@
+<View className="results">
+    <If>
+        <Condition lhs="{{outcome}}" operator="EQUALS" rhs="win"/>
+        <View><Text className="headline" content="You win!"/></View>
+        <ElseIf>
+            <Condition lhs="{{outcome}}" operator="EQUALS" rhs="lose"/>
+            <View><Text className="headline" content="{{FBInstant.players[{{opponentID}}].name}} wins"/></View>
+        </ElseIf>
+        <ElseIf>
+            <Condition lhs="{{outcome}}" operator="EQUALS" rhs="tie"/>
+            <View><Text className="headline" content="Tie game"/></View>
+        </ElseIf>
+        <Else>
+            <View><Text className="headline" content="Waiting for {{FBInstant.players[{{opponentID}}].name}}"/></View>
+        </Else>
+    </If>
+    <View className="result-row">
+        <Image className="avatar" src="{{FBInstant.player.photo}}" width="56" height="56"/>
+        <Text className="result-name" content="{{FBInstant.player.name}}"/>
+        <Text className="result-score" content="{{myScore}}"/>
+    </View>
+    <View className="result-row">
+        <Image className="avatar" src="{{FBInstant.players[{{opponentID}}].photo}}" width="56" height="56"/>
+        <Text className="result-name" content="{{FBInstant.players[{{opponentID}}].name}}"/>
+        <If>
+            <Condition lhs="{{outcome}}" operator="EQUALS" rhs="waiting"/>
+            <View><Text className="result-score result-pending" content="-"/></View>
+            <Else>
+                <View><Text className="result-score" content="{{opponentScore}}"/></View>
+            </Else>
+        </If>
+    </View>
+</View>

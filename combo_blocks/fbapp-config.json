@@ -1,0 +1,12 @@
+{
+  "instant_games": {
+    "orientation": "PORTRAIT",
+    "override_web_orientation": "PORTRAIT",
+    "navigation_menu_version": "NAV_FLOATING",
+    "custom_update_templates": {
+      "turn_done": {
+        "example": "Player X scored 120 on your Combo Blocks grid. Your turn!"
+      }
+    }
+  }
+}

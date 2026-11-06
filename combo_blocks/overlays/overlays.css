@@ -1,0 +1,132 @@
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+body {
+  background: transparent;
+  color: #fff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.friend-row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.avatar {
+  border: 3px solid #fff;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-small {
+  border-width: 2px;
+}
+
+.friend-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.play-button {
+  background: #1aa29a;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #0e6b66;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 8px 18px;
+}
+
+.versus {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.versus-label {
+  color: #cfc22a;
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.versus-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headline {
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0 0 4px;
+  text-align: center;
+}
+
+.result-row {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  display: flex;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+.result-name {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.result-score {
+  color: #cfc22a;
+  font-size: 30px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.result-pending {
+  color: #888;
+}

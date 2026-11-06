@@ -1,0 +1,65 @@
+<!--
+  Copyright (c) Meta Platforms, Inc. and affiliates.
+
+  This source code is licensed under the license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://connect.facebook.net/en_US/fbinstant.restricted.latest.js"></script>
+  <script src="main.js" type="module"></script>
+  <title>Combo Blocks</title>
+</head>
+
+<body>
+  <div id="screen-loading" class="screen center">
+    <h1 class="logo"><span class="logo-tile c1">COM</span><span class="logo-tile c2">BO</span></h1>
+  </div>
+
+  <div id="screen-home" class="screen" hidden>
+    <h1 class="logo"><span class="logo-tile c1">COM</span><span class="logo-tile c2">BO</span> <span class="logo-word">Blocks</span></h1>
+    <p class="tagline">Build words from syllable blocks. Same blocks for you and your friend.</p>
+    <div id="home-overlay" class="overlay-slot home-slot" hidden></div>
+    <p id="home-empty" class="muted" hidden>No friends to play with right now.</p>
+    <button id="solo-button" class="big-button">Practice solo</button>
+  </div>
+
+  <div id="screen-round" class="screen" hidden>
+    <div class="top-bar">
+      <div id="versus-overlay" class="overlay-slot versus-slot" hidden></div>
+      <div class="stat"><span class="stat-label">Time</span><span id="round-timer">1:30</span></div>
+      <div class="stat"><span class="stat-label">Score</span><span id="round-score">0</span></div>
+      <button id="end-button" class="end-button" hidden>End</button>
+    </div>
+    <div class="board-wrap">
+      <div id="board"></div>
+      <div id="start-cover" class="start-cover">
+        <button id="start-button" class="big-button">Start</button>
+        <p class="hint">2 blocks +10 · 3 blocks +30 · 4 blocks +60 · rare words ×2</p>
+      </div>
+    </div>
+    <div id="round-words" class="words"></div>
+  </div>
+
+  <div id="screen-results" class="screen" hidden>
+    <div id="results-overlay" class="overlay-slot results-slot" hidden></div>
+    <p id="results-summary" class="summary"></p>
+    <p id="send-status" class="muted center-text"></p>
+    <div id="results-match" class="results-match" hidden>
+      <div id="results-grid" class="mini-grid"></div>
+      <p id="results-words-title" class="section-label"></p>
+      <div id="results-words" class="words"></div>
+    </div>
+    <button id="remind-button" class="big-button" hidden>Send a reminder</button>
+    <button id="rematch-button" class="big-button" hidden>Rematch</button>
+    <button id="home-button" class="big-button secondary">Home</button>
+  </div>
+</body>
+
+</html>

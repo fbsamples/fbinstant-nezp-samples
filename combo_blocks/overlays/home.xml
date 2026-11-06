@@ -1,0 +1,28 @@
+<View className="home">
+    <If>
+        <Condition lhs="{{showConnected}}" operator="EQUALS" rhs="yes"/>
+        <View className="section">
+            <Text className="section-title" content="Friends playing"/>
+            <For source="{{FBInstant.player.connectedPlayers}}" itemName="p" sortKey="name" limit="10">
+                <View className="friend-row">
+                    <Image className="avatar" src="{{p.photo}}" width="48" height="48"/>
+                    <Text className="friend-name" content="{{p.name}}"/>
+                    <Button className="play-button" action="{{FBInstant.action.contextCreate({{p.id}})}}" content="Play"/>
+                </View>
+            </For>
+        </View>
+    </If>
+    <If>
+        <Condition lhs="{{showFriendMatch}}" operator="EQUALS" rhs="yes"/>
+        <View className="section">
+            <Text className="section-title" content="Challenge a friend"/>
+            <For source="{{candidates}}" itemName="f" limit="10">
+                <View className="friend-row">
+                    <Image className="avatar" src="{{FBInstant.friendMatch[{{f.id}}].photo}}" width="48" height="48"/>
+                    <Text className="friend-name" content="{{FBInstant.friendMatch[{{f.id}}].name}}"/>
+                    <Button className="play-button" action="{{FBInstant.action.friendMatchSelect({{f.id}})}}" content="Play"/>
+                </View>
+            </For>
+        </View>
+    </If>
+</View>
