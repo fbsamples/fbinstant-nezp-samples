@@ -50,11 +50,13 @@ window.addEventListener('DOMContentLoaded', function () {
       document.getElementById('overlay_dev_params').value =
         '{"players":[{"name":"Zebra","score":100},{"name":"Lion","score":200},{"name":"Pig","score":300},{"name":"currentPlayer","score":250},{"name":"Frog", "score":500},{"name":"Hippo", "score":600},{"name":"Cat", "score":600}]}';
 
-      FBInstant.onContextChange((contextID, selectedPlayerID) => {
+      FBInstant.onContextChange((contextID, selectedPlayerIDs) => {
         document.getElementById('overlayContextResponse').innerHTML +=
           ' ' +
           contextID +
-          (selectedPlayerID != null ? ' (with ' + selectedPlayerID + ')' : '');
+          (selectedPlayerIDs != null
+            ? ' (with ' + selectedPlayerIDs.join(', ') + ')'
+            : '');
         FBInstant.player.getDataAsync(['contextIDs']).then(data => {
           const existingContextIDs = Array.isArray(data.contextIDs)
             ? data.contextIDs
@@ -65,6 +67,13 @@ window.addEventListener('DOMContentLoaded', function () {
           FBInstant.player.setDataAsync({contextIDs: existingContextIDs});
         });
       });
+
+      if (typeof FBInstant.onFriendMatchSelectionChange === 'function') {
+        FBInstant.onFriendMatchSelectionChange(ids => {
+          document.getElementById('overlayCustomEventOutput').innerHTML +=
+            ' |Friend Match selection: ' + ids.length + ' friend(s)| ';
+        });
+      }
 
       // Getting payments
       document.getElementById('showStore').addEventListener('click', () => {

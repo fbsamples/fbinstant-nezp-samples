@@ -1,7 +1,7 @@
 # Friend Match (beta)
 
 Friend Match lets a Zero Permissions game show friends the player can invite to
-a 1:1 game, inside the game's own UI. Meta renders the friends' names and
+a 1:1 game or a group, inside the game's own UI. Meta renders the friends' names and
 photos in an overlay view; the game never receives them.
 
 Friend Match is in a closed beta and only works for games and players that are
@@ -65,13 +65,13 @@ Names and photos cannot be used in event attributes (`onTapEvent`,
 The `friendMatchSelect` button action is the only way to pick a friend. When the
 player taps it, Meta starts a 1:1 game with that friend and switches the game
 into it. Your `onContextChange` success handler then receives the friend's
-player ID as a second argument:
+player ID in an array as a second argument:
 
 ```javascript
 FBInstant.onContextChange(
-  (contextID, selectedPlayerID) => {
-    if (selectedPlayerID != null) {
-      startMatchWith(selectedPlayerID);
+  (contextID, selectedPlayerIDs) => {
+    if (selectedPlayerIDs != null) {
+      startMatchWith(selectedPlayerIDs);
     }
   },
   error => {
@@ -83,6 +83,53 @@ FBInstant.onContextChange(
 ```
 
 If anything fails, the error handler is called and no player ID is given.
+
+## 4. Start a group (multi-select)
+
+Players can also pick 2 to 5 friends and start a group with all of them. Meta
+keeps the selection: use `friendMatchToggle` buttons to add or remove a friend,
+the local key `FBInstant.friendMatch.selection` (a JSON array of the selected
+IDs) to show who is selected, and one `friendMatchCreateGroup` button to start
+the group.
+
+```xml
+<View>
+  <For source="{{candidates}}" itemName="f" limit="10">
+    <View>
+      <Image src="{{FBInstant.friendMatch[{{f.id}}].photo}}" width="40" height="40" />
+      <Text content="{{FBInstant.friendMatch[{{f.id}}].name}}" />
+      <If>
+        <Condition lhs="{{f.id}}" operator="IN" rhs="{{FBInstant.friendMatch.selection}}"/>
+        <View><Button action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Selected" /></View>
+        <Else>
+          <View><Button action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Select" /></View>
+        </Else>
+      </If>
+    </View>
+  </For>
+  <Button action="{{FBInstant.action.friendMatchCreateGroup()}}" content="Start group" />
+  <Button action="{{FBInstant.action.friendMatchClearSelection()}}" content="Clear" />
+</View>
+```
+
+- Overlays that use `FBInstant.friendMatch.selection` update by themselves
+  when the selection changes; you do not need to call `updateAsync`.
+- To show a count or enable your own UI, listen for changes. The callback gets
+  the selected IDs from your candidate list, in the order they were picked:
+
+  ```javascript
+  FBInstant.onFriendMatchSelectionChange(ids => {
+    selectedCount.textContent = ids.length;
+  });
+  ```
+
+- Tapping the create button shows Meta's dialog with the selected friends. When
+  the player confirms, Meta creates the group and switches the game into it,
+  and `onContextChange` receives the friends' player IDs. Closing the dialog
+  keeps the selection; if a friend can no longer be selected, the error handler
+  is called and the selection is cleared.
+- The create button does nothing with fewer than two friends selected, and a
+  sixth friend cannot be added.
 
 ## Things to get right
 

@@ -118,7 +118,10 @@ export async function setOverlayDevParams(overlayName) {
     const playerID =
       connectedPlayers.length > 0 ? connectedPlayers[0].getID() : 'REPLACE-ME';
     devParams = {playerID};
-  } else if (overlayName === 'ig_views/friend_match.xml') {
+  } else if (
+    overlayName === 'ig_views/friend_match.xml' ||
+    overlayName === 'ig_views/friend_match_group.xml'
+  ) {
     devParams = {candidates: await getFriendMatchCandidates()};
   } else if (overlayName === 'ig_views/dynamic_key.xml') {
     devParams = {

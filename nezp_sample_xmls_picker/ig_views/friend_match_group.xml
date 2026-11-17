@@ -1,0 +1,17 @@
+<View>
+    <For source="{{candidates}}" itemName="f" limit="10">
+        <View>
+            <Image src="{{FBInstant.friendMatch[{{f.id}}].photo}}" width="40" height="40" />
+            <Text content="{{FBInstant.friendMatch[{{f.id}}].name}}" />
+            <If>
+                <Condition lhs="{{f.id}}" operator="IN" rhs="{{FBInstant.friendMatch.selection}}"/>
+                <View><Button action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Selected" /></View>
+                <Else>
+                    <View><Button action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Select" /></View>
+                </Else>
+            </If>
+        </View>
+    </For>
+    <Button action="{{FBInstant.action.friendMatchCreateGroup()}}" content="Start group" />
+    <Button action="{{FBInstant.action.friendMatchClearSelection()}}" content="Clear" />
+</View>

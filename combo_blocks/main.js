@@ -492,11 +492,12 @@ async function main() {
   state.saved = data?.[PLAYER_DATA_KEY] ?? {};
 
   FBInstant.onContextChange(
-    (contextID, playerID) => {
+    // After a Friend Match pick, playerIDs holds the friend's player ID.
+    (contextID, playerIDs) => {
       const next =
         contextID == null
           ? showHome()
-          : openMatch(contextID, playerID ?? null, null);
+          : openMatch(contextID, playerIDs?.[0] ?? null, null);
       next.catch(error => logError('onContextChange', error));
     },
     error => logError('context change failed', error),
