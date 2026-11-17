@@ -12,12 +12,14 @@ import {drawUpdateCard} from './src/card.js';
 import {generateGrid} from './src/grid.js';
 import {
   PLAYER_DATA_KEY,
-  newerResult,
+  mergeOpponentIDs,
+  mergeResult,
   outcomeFor,
-  readOpponentResult,
+  readIncomingResult,
   resolveChallenge,
   saveContextEntry,
   seedFor,
+  standingsFor,
 } from './src/match.js';
 import {checkWord, createDictionary} from './src/words.js';
 
@@ -35,9 +37,13 @@ const state = {
   saved: {},
   // Overlay name -> Promise<OverlayView>. Overlays are created once and reused.
   overlays: {},
-  // {contextID, opponentID, mine, opponent, words, sendStatus, sendError}
-  // while in a 1:1 context.
+  // {contextID, opponentIDs, mine, results, words, sendStatus, sendError}
+  // while in a context with friends: 1:1 or a group of up to 5 opponents.
   match: null,
+  // Friend Match picking mode in the home overlay: 'unavailable' when the SDK
+  // has no multi-select, otherwise 'off' (one friend) or 'on' (several).
+  multiSelect: 'unavailable',
+  selectedCount: 0,
   // Tiles and words of the round just played, solo or not.
   lastRound: null,
   startRound: null,
@@ -110,9 +116,22 @@ function getFriendMatchCandidates() {
   });
 }
 
+function renderSelectionStatus() {
+  const status = $('selection-status');
+  status.hidden = state.multiSelect !== 'on';
+  const count = state.selectedCount;
+  status.textContent =
+    count === 0
+      ? 'Pick 2 to 5 friends to challenge together.'
+      : count === 1
+        ? '1 friend picked. Pick at least one more.'
+        : `${count} friends picked.`;
+}
+
 async function showHome() {
   state.match = null;
   showScreen('home');
+  renderSelectionStatus();
   const [connectedCount, candidates] = await Promise.all([
     getConnectedPlayerCount(),
     getFriendMatchCandidates(),
@@ -121,13 +140,24 @@ async function showHome() {
   $('home-empty').hidden = hasFriends;
   if (!hasFriends) {
     $('home-overlay').hidden = true;
+    $('selection-status').hidden = true;
     return;
   }
   await showOverlay('home', $('home-overlay'), {
     showConnected: connectedCount > 0 ? 'yes' : 'no',
     showFriendMatch: candidates.length > 0 ? 'yes' : 'no',
+    multiSelect: state.multiSelect,
     candidates: candidates.map(id => ({id})),
   }).catch(error => logError('home overlay', error));
+}
+
+// The home overlay's "Challenge several" / "One friend" toggle.
+function setMultiSelect(on) {
+  if (state.multiSelect === 'unavailable') {
+    return;
+  }
+  state.multiSelect = on ? 'on' : 'off';
+  showHome().catch(error => logError('showHome', error));
 }
 
 // ---------- Matches ----------
@@ -142,34 +172,45 @@ async function saveEntry(contextID, entry) {
     .catch(error => logError('setDataAsync', error));
 }
 
-async function findOpponentID() {
+async function getContextPlayerIDs() {
   try {
-    const myID = FBInstant.player.getID();
     const players = await FBInstant.context.getPlayersAsync();
-    return players.map(p => p.getID()).find(id => id !== myID) ?? null;
+    return players.map(p => p.getID());
   } catch (error) {
     logError('getPlayersAsync', error);
-    return null;
+    return [];
   }
 }
 
-async function openMatch(contextID, opponentID, incoming) {
-  const entry = state.saved[contextID] ?? {m: null, o: null};
-  const opponent = newerResult(entry.o, incoming);
-  if (opponent !== entry.o) {
-    await saveEntry(contextID, {...entry, o: opponent});
-  }
+/**
+ * Opens a context with friends. `friendIDs` are the players a Friend Match
+ * pick just started it with; the context's players and earlier results add
+ * anyone else, so friends who never played still count as opponents.
+ */
+async function openMatch(contextID, friendIDs, incoming) {
+  const entry = state.saved[contextID] ?? {};
+  const results = mergeResult(entry.r ?? {}, incoming);
+  const opponentIDs = mergeOpponentIDs(
+    FBInstant.player.getID(),
+    entry.ids,
+    friendIDs,
+    await getContextPlayerIDs(),
+    incoming?.members,
+    Object.keys(results),
+  );
+  const mine = entry.m ?? null;
+  await saveEntry(contextID, {...entry, r: results, ids: opponentIDs});
   state.match = {
     contextID,
-    opponentID: opponentID ?? (await findOpponentID()),
-    mine: entry.m,
-    opponent,
+    opponentIDs,
+    mine,
+    results,
     words: entry.w ?? [],
     sendStatus: null,
     sendError: null,
   };
   state.lastRound = null;
-  const {phase, challengeNo} = resolveChallenge(entry.m, opponent);
+  const {phase, challengeNo} = resolveChallenge(mine, results, opponentIDs);
   if (phase === 'play') {
     startRound(challengeNo);
   } else {
@@ -196,11 +237,13 @@ function withTimeout(promise, ms) {
   });
 }
 
-function sendTurnUpdate(mine, opponent, isReminder) {
+function sendTurnUpdate(match, isReminder) {
   if (!FBInstant.getSupportedAPIs().includes('updateAsync')) {
     return Promise.reject(new Error('updateAsync is not supported here'));
   }
-  const bothPlayed = opponent != null && opponent.c === mine.c;
+  const {mine} = match;
+  const bothPlayed =
+    outcomeFor(mine, match.results, match.opponentIDs).outcome !== 'waiting';
   let text = `I scored ${mine.s} on our Combo Blocks grid. Your turn!`;
   let subtitle = 'Same blocks. Can you beat it?';
   if (isReminder) {
@@ -217,7 +260,14 @@ function sendTurnUpdate(mine, opponent, isReminder) {
       cta: bothPlayed ? 'See results' : 'Play',
       text,
       image: drawUpdateCard(mine.s, subtitle),
-      data: {[PLAYER_DATA_KEY]: mine},
+      // Who sent it and who is in the match, for group members.
+      data: {
+        [PLAYER_DATA_KEY]: {
+          ...mine,
+          p: FBInstant.player.getID(),
+          g: [FBInstant.player.getID(), ...match.opponentIDs],
+        },
+      },
       strategy: 'IMMEDIATE',
       notification: 'NO_PUSH',
     }),
@@ -233,7 +283,7 @@ function sendUpdateWithStatus(isReminder) {
   const isCurrent = () => state.match === match;
   match.sendStatus = 'sending';
   renderSendStatus();
-  sendTurnUpdate(match.mine, match.opponent, isReminder).then(
+  sendTurnUpdate(match, isReminder).then(
     () => {
       match.sendStatus = isReminder ? 'reminded' : 'sent';
       if (isCurrent()) {
@@ -273,9 +323,9 @@ function startRound(challengeNo) {
   $('round-words').replaceChildren();
   $('start-cover').hidden = false;
 
-  if (match?.opponentID != null) {
+  if (match != null && match.opponentIDs.length > 0) {
     showOverlay('versus', $('versus-overlay'), {
-      opponentID: match.opponentID,
+      opponents: match.opponentIDs.map(id => ({id})),
     }).catch(error => logError('versus overlay', error));
   } else {
     $('versus-overlay').hidden = true;
@@ -339,7 +389,12 @@ async function finishRound(challengeNo, score) {
   match.words = words;
   match.sendStatus = null;
   match.sendError = null;
-  await saveEntry(match.contextID, {m: mine, o: match.opponent, w: words});
+  await saveEntry(match.contextID, {
+    m: mine,
+    r: match.results,
+    ids: match.opponentIDs,
+    w: words,
+  });
   FBInstant.player
     .flushDataAsync()
     .catch(error => logError('flushDataAsync', error));
@@ -379,10 +434,13 @@ function renderSendStatus() {
     $('remind-button').hidden = true;
     return;
   }
-  const waiting = outcomeFor(match.mine, match.opponent) === 'waiting';
+  const waiting =
+    outcomeFor(match.mine, match.results, match.opponentIDs).outcome ===
+    'waiting';
+  const friends = match.opponentIDs.length > 1 ? 'your friends' : 'your friend';
   const messages = {
     sending: 'Sending your score...',
-    sent: 'Score sent to your friend.',
+    sent: `Score sent to ${friends}.`,
     reminded: 'Reminder sent.',
     failed: `Could not send your score (${match.sendError ?? 'unknown'}). Try Send a reminder.`,
   };
@@ -390,7 +448,7 @@ function renderSendStatus() {
     match.sendStatus != null
       ? messages[match.sendStatus]
       : waiting
-        ? 'Waiting for your friend to play this grid.'
+        ? `Waiting for ${friends} to play this grid.`
         : '';
   $('remind-button').hidden = !waiting || match.mine == null;
   $('remind-button').disabled =
@@ -409,9 +467,18 @@ function showSoloResults(score) {
   }
 }
 
+function waitingTextFor(mine, results, opponentIDs) {
+  const waitingFor = standingsFor(mine, results, opponentIDs).filter(
+    row => row.played === 'no',
+  ).length;
+  return waitingFor === 1
+    ? 'Waiting for 1 friend'
+    : `Waiting for ${waitingFor} friends`;
+}
+
 function showResults() {
-  const {contextID, mine, opponent, opponentID, words} = state.match;
-  const outcome = outcomeFor(mine, opponent);
+  const {contextID, mine, results, opponentIDs, words} = state.match;
+  const {outcome, winnerID} = outcomeFor(mine, results, opponentIDs);
   showScreen('results');
   $('rematch-button').textContent = 'Rematch';
   $('rematch-button').hidden = outcome === 'waiting';
@@ -423,20 +490,18 @@ function showResults() {
       generateGrid(seedFor(contextID, mine.c), state.seeds).tiles;
     renderMatchView(tiles, words);
   }
-  if (opponentID == null) {
+  if (opponentIDs.length === 0) {
     $('results-overlay').hidden = true;
-    $('results-summary').textContent =
-      outcome === 'waiting'
-        ? `You scored ${mine?.s ?? 0}.`
-        : `You ${mine.s} - ${opponent.s} Opponent`;
+    $('results-summary').textContent = `You scored ${mine?.s ?? 0}.`;
     return;
   }
   $('results-summary').textContent = '';
   showOverlay('results', $('results-overlay'), {
-    opponentID,
     myScore: mine?.s ?? 0,
-    opponentScore: opponent?.s ?? 0,
     outcome,
+    winnerID: winnerID ?? '',
+    waitingText: waitingTextFor(mine, results, opponentIDs),
+    standings: standingsFor(mine, results, opponentIDs),
   }).catch(error => logError('results overlay', error));
 }
 
@@ -491,13 +556,35 @@ async function main() {
     });
   state.saved = data?.[PLAYER_DATA_KEY] ?? {};
 
+  if (
+    typeof FBInstant.onFriendMatchSelectionChange === 'function' &&
+    FBInstant.overlayViews?.setCustomEventHandler != null
+  ) {
+    state.multiSelect = 'off';
+    FBInstant.onFriendMatchSelectionChange(ids => {
+      state.selectedCount = ids.length;
+      renderSelectionStatus();
+    });
+    FBInstant.overlayViews.setCustomEventHandler(event => {
+      if (event === 'friend_match_multi') {
+        setMultiSelect(true);
+      } else if (event === 'friend_match_single') {
+        setMultiSelect(false);
+      }
+    });
+  }
+
   FBInstant.onContextChange(
-    // After a Friend Match pick, playerIDs holds the friend's player ID.
+    // After a Friend Match pick, playerIDs holds the picked friends' player
+    // IDs: one for a 1:1 game, up to five for a group.
     (contextID, playerIDs) => {
+      if (playerIDs != null && state.multiSelect === 'on') {
+        state.multiSelect = 'off';
+      }
       const next =
         contextID == null
           ? showHome()
-          : openMatch(contextID, playerIDs?.[0] ?? null, null);
+          : openMatch(contextID, playerIDs ?? [], null);
       next.catch(error => logError('onContextChange', error));
     },
     error => logError('context change failed', error),
@@ -507,8 +594,8 @@ async function main() {
   if (contextID != null && FBInstant.context.getType() !== 'SOLO') {
     await openMatch(
       contextID,
-      null,
-      readOpponentResult(FBInstant.getEntryPointData()),
+      [],
+      readIncomingResult(FBInstant.getEntryPointData()),
     );
   } else {
     await showHome();

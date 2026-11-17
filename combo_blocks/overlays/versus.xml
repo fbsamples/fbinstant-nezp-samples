@@ -1,6 +1,10 @@
 <View className="versus">
     <Image className="avatar avatar-small" src="{{FBInstant.player.photo}}" width="36" height="36"/>
     <Text className="versus-label" content="vs"/>
-    <Image className="avatar avatar-small" src="{{FBInstant.players[{{opponentID}}].photo}}" width="36" height="36"/>
-    <Text className="versus-name" content="{{FBInstant.players[{{opponentID}}].name}}"/>
+    <For source="{{opponents}}" itemName="o" limit="5">
+        <View className="versus-opponent">
+            <Image className="avatar avatar-small" src="{{FBInstant.players[{{o.id}}].photo}}" width="36" height="36"/>
+            <Text className="versus-name" content="{{FBInstant.players[{{o.id}}].name}}"/>
+        </View>
+    </For>
 </View>

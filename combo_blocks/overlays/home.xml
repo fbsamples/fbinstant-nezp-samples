@@ -15,14 +15,45 @@
     <If>
         <Condition lhs="{{showFriendMatch}}" operator="EQUALS" rhs="yes"/>
         <View className="section">
-            <Text className="section-title" content="Challenge a friend"/>
+            <View className="section-header">
+                <Text className="section-title" content="Challenge a friend"/>
+                <If>
+                    <Condition lhs="{{multiSelect}}" operator="EQUALS" rhs="on"/>
+                    <View className="mode-toggle" onTapEvent="friend_match_single"><Text className="mode-toggle-text" content="One friend"/></View>
+                    <ElseIf>
+                        <Condition lhs="{{multiSelect}}" operator="EQUALS" rhs="off"/>
+                        <View className="mode-toggle" onTapEvent="friend_match_multi"><Text className="mode-toggle-text" content="Challenge several"/></View>
+                    </ElseIf>
+                </If>
+            </View>
             <For source="{{candidates}}" itemName="f" limit="10">
                 <View className="friend-row">
                     <Image className="avatar" src="{{FBInstant.friendMatch[{{f.id}}].photo}}" width="48" height="48"/>
                     <Text className="friend-name" content="{{FBInstant.friendMatch[{{f.id}}].name}}"/>
-                    <Button className="play-button" action="{{FBInstant.action.friendMatchSelect({{f.id}})}}" content="Play"/>
+                    <If>
+                        <Condition lhs="{{multiSelect}}" operator="EQUALS" rhs="on"/>
+                        <View>
+                            <If>
+                                <Condition lhs="{{f.id}}" operator="IN" rhs="{{FBInstant.friendMatch.selection}}"/>
+                                <View><Button className="pick-button pick-button-on" action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Picked"/></View>
+                                <Else>
+                                    <View><Button className="pick-button" action="{{FBInstant.action.friendMatchToggle({{f.id}})}}" content="Pick"/></View>
+                                </Else>
+                            </If>
+                        </View>
+                        <Else>
+                            <View><Button className="play-button" action="{{FBInstant.action.friendMatchSelect({{f.id}})}}" content="Play"/></View>
+                        </Else>
+                    </If>
                 </View>
             </For>
+            <If>
+                <Condition lhs="{{multiSelect}}" operator="EQUALS" rhs="on"/>
+                <View className="group-actions">
+                    <Button className="play-button" action="{{FBInstant.action.friendMatchCreateGroup()}}" content="Challenge picked friends"/>
+                    <Button className="clear-button" action="{{FBInstant.action.friendMatchClearSelection()}}" content="Clear"/>
+                </View>
+            </If>
         </View>
     </If>
 </View>

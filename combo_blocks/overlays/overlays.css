@@ -130,3 +130,63 @@ body {
 .result-pending {
   color: #888;
 }
+
+.section-header {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mode-toggle {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.mode-toggle-text {
+  color: #cfc22a;
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.pick-button {
+  background: transparent;
+  border: 2px solid #1aa29a;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 6px 14px;
+}
+
+.pick-button-on {
+  background: #1aa29a;
+}
+
+.group-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.clear-button {
+  background: #555;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 8px 14px;
+}
+
+.versus-opponent {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}

@@ -94,7 +94,14 @@ body {
 }
 
 .results-slot {
-  height: 300px;
+  height: 420px;
+}
+
+.selection-status {
+  color: #cfc22a;
+  font-weight: 800;
+  margin: 4px 0;
+  text-align: center;
 }
 
 .overlay-frame {

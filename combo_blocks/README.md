@@ -21,27 +21,36 @@ word counts, whatever its "real" syllables are.
   `FBInstant.action.contextCreate`). "Challenge a friend" lists Friend Match
   candidates (`FBInstant.getFriendMatchCandidatesAsync()`, Play selects with
   `FBInstant.action.friendMatchSelect`). Each section is hidden when empty.
-- **Starting a match.** `FBInstant.onContextChange(contextID, playerID)` gives
-  the new 1:1 context and, after a Friend Match selection, the friend's player
-  ID before the friend has ever opened the game.
+- **Challenging several friends.** "Challenge several" (an `onTapEvent` the
+  game handles) switches the Friend Match section to multi-select in the same
+  overlay: each friend gets a Pick button (`FBInstant.action.friendMatchToggle`)
+  that shows Picked through `FBInstant.friendMatch.selection`, and
+  "Challenge picked friends" (`FBInstant.action.friendMatchCreateGroup`) starts
+  a group with 2 to 5 of them. The game shows how many are picked from
+  `FBInstant.onFriendMatchSelectionChange`. "One friend" switches back. The
+  toggle only appears when the SDK supports multi-select.
+- **Starting a match.** `FBInstant.onContextChange(contextID, playerIDs)` gives
+  the new context and, after a Friend Match pick, the picked friends' player
+  IDs before they have ever opened the game: one for 1:1, up to five for a
+  group.
 - **Same grid for both.** The grid is generated from
   `"<contextID>:<challengeNo>"` with a seeded PRNG, so no grid data needs to
   be sent. Rematches bump `challengeNo`.
 - **Async turns.** At the end of a round (time up or End) the score is saved
-  in player data and sent to the opponent with `FBInstant.updateAsync`. The
+  in player data and sent to the context with `FBInstant.updateAsync`. The
+  update carries the sender's player ID and everyone in the match, so group
+  members tell results apart and know who they are still waiting for. The
   card image is drawn on a canvas in game code and shows only the score; the
   score travels in the update's `data` and arrives through
   `FBInstant.getEntryPointData()`. The results screen says whether the update
-  was sent, and while the opponent has not played it shows your grid and words
-  and a Send a reminder button that sends another update.
+  was sent, and while anyone has not played it shows your grid and words and a
+  Send a reminder button that sends another update. Results list every
+  opponent, best score first, and wait until everyone has played.
 - **No personal data in game code.** Names and photos only appear in overlays
   (`overlays/*.xml`); the game handles only IDs and scores.
 
-Matches are 1:1 for now. Game state is kept per player list and results wait
-until everyone has played, so group matches only need platform support.
-
-Known limitation: a player only learns the opponent's score by opening the
-game from the opponent's update.
+Known limitation: a player only learns an opponent's score by opening the
+game from that opponent's update.
 
 ## Layout
 

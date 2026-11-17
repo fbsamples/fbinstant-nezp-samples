@@ -13,12 +13,14 @@ import {test} from 'node:test';
 
 import {GRID_SIZE, generateGrid} from '../src/grid.js';
 import {
-  newerResult,
+  mergeOpponentIDs,
+  mergeResult,
   outcomeFor,
-  readOpponentResult,
+  readIncomingResult,
   resolveChallenge,
   saveContextEntry,
   seedFor,
+  standingsFor,
 } from '../src/match.js';
 import {createRng, hashString} from '../src/rng.js';
 import {
@@ -96,45 +98,109 @@ test('rare words score double', () => {
   assert.equal(result.points, 20);
 });
 
-test('resolveChallenge picks play, waiting or results', () => {
-  assert.deepEqual(resolveChallenge(null, null), {phase: 'play', challengeNo: 1});
-  assert.deepEqual(resolveChallenge(null, {c: 1, s: 40}), {
+const ONE = ['p1'];
+const GROUP = ['p1', 'p2', 'p3'];
+
+test('resolveChallenge picks play, waiting or results for 1:1', () => {
+  assert.deepEqual(resolveChallenge(null, {}, ONE), {phase: 'play', challengeNo: 1});
+  assert.deepEqual(resolveChallenge(null, {p1: {c: 1, s: 40}}, ONE), {
     phase: 'play',
     challengeNo: 1,
   });
-  assert.deepEqual(resolveChallenge({c: 1, s: 30}, null), {
+  assert.deepEqual(resolveChallenge({c: 1, s: 30}, {}, ONE), {
     phase: 'waiting',
     challengeNo: 1,
   });
-  assert.deepEqual(resolveChallenge({c: 1, s: 30}, {c: 1, s: 40}), {
+  assert.deepEqual(resolveChallenge({c: 1, s: 30}, {p1: {c: 1, s: 40}}, ONE), {
     phase: 'results',
     challengeNo: 1,
   });
-  assert.deepEqual(resolveChallenge({c: 1, s: 30}, {c: 2, s: 50}), {
+  assert.deepEqual(resolveChallenge({c: 1, s: 30}, {p1: {c: 2, s: 50}}, ONE), {
     phase: 'play',
     challengeNo: 2,
   });
-  assert.deepEqual(resolveChallenge({c: 2, s: 30}, {c: 1, s: 50}), {
+  assert.deepEqual(resolveChallenge({c: 2, s: 30}, {p1: {c: 1, s: 50}}, ONE), {
     phase: 'waiting',
     challengeNo: 2,
   });
 });
 
-test('opponent results are read and merged safely', () => {
-  assert.deepEqual(readOpponentResult({cb: {c: 2, s: 90}}), {c: 2, s: 90});
-  assert.equal(readOpponentResult({cb: {c: 'x', s: 90}}), null);
-  assert.equal(readOpponentResult(null), null);
-  assert.deepEqual(newerResult({c: 1, s: 10}, {c: 2, s: 5}), {c: 2, s: 5});
-  assert.deepEqual(newerResult({c: 2, s: 10}, {c: 1, s: 5}), {c: 2, s: 10});
-  assert.deepEqual(newerResult(null, {c: 1, s: 5}), {c: 1, s: 5});
+test('a group shows results only once everyone played', () => {
+  const mine = {c: 1, s: 30};
+  const two = {p1: {c: 1, s: 20}, p2: {c: 1, s: 50}};
+  assert.equal(resolveChallenge(mine, two, GROUP).phase, 'waiting');
+  assert.deepEqual(outcomeFor(mine, two, GROUP), {outcome: 'waiting'});
+  const all = {...two, p3: {c: 1, s: 10}};
+  assert.equal(resolveChallenge(mine, all, GROUP).phase, 'results');
+  assert.deepEqual(outcomeFor(mine, all, GROUP), {outcome: 'lose', winnerID: 'p2'});
+  // The newest challenge anyone started is the one to play.
+  assert.deepEqual(resolveChallenge(mine, {...all, p3: {c: 2, s: 5}}, GROUP), {
+    phase: 'play',
+    challengeNo: 2,
+  });
 });
 
-test('outcome waits until both played the same challenge', () => {
-  assert.equal(outcomeFor({c: 1, s: 30}, null), 'waiting');
-  assert.equal(outcomeFor({c: 2, s: 30}, {c: 1, s: 90}), 'waiting');
-  assert.equal(outcomeFor({c: 1, s: 30}, {c: 1, s: 20}), 'win');
-  assert.equal(outcomeFor({c: 1, s: 30}, {c: 1, s: 40}), 'lose');
-  assert.equal(outcomeFor({c: 1, s: 30}, {c: 1, s: 30}), 'tie');
+test('outcome waits until everyone played the same challenge', () => {
+  assert.deepEqual(outcomeFor({c: 1, s: 30}, {}, ONE), {outcome: 'waiting'});
+  assert.deepEqual(outcomeFor({c: 2, s: 30}, {p1: {c: 1, s: 90}}, ONE), {
+    outcome: 'waiting',
+  });
+  assert.deepEqual(outcomeFor({c: 1, s: 30}, {p1: {c: 1, s: 20}}, ONE), {
+    outcome: 'win',
+  });
+  assert.deepEqual(outcomeFor({c: 1, s: 30}, {p1: {c: 1, s: 40}}, ONE), {
+    outcome: 'lose',
+    winnerID: 'p1',
+  });
+  assert.deepEqual(
+    outcomeFor({c: 1, s: 30}, {p1: {c: 1, s: 30}, p2: {c: 1, s: 10}}, ['p1', 'p2']),
+    {outcome: 'tie'},
+  );
+  assert.deepEqual(outcomeFor({c: 1, s: 30}, {}, []), {outcome: 'waiting'});
+});
+
+test('standings list who played, best first, then who has not', () => {
+  const results = {p1: {c: 1, s: 20}, p2: {c: 1, s: 50}, p3: {c: 0, s: 0}};
+  assert.deepEqual(standingsFor({c: 1, s: 30}, results, GROUP), [
+    {id: 'p2', score: 50, played: 'yes'},
+    {id: 'p1', score: 20, played: 'yes'},
+    {id: 'p3', score: 0, played: 'no'},
+  ]);
+});
+
+test('incoming results carry the sender and keep the newest per player', () => {
+  assert.deepEqual(readIncomingResult({cb: {c: 2, s: 90, p: 'p1'}}), {
+    playerID: 'p1',
+    members: [],
+    c: 2,
+    s: 90,
+  });
+  assert.deepEqual(
+    readIncomingResult({cb: {c: 1, s: 5, p: 'p1', g: ['p1', 'me', 7, 'p2']}})
+      .members,
+    ['p1', 'me', 'p2'],
+  );
+  assert.equal(readIncomingResult({cb: {c: 2, s: 90}}), null);
+  assert.equal(readIncomingResult({cb: {c: 'x', s: 90, p: 'p1'}}), null);
+  assert.equal(readIncomingResult(null), null);
+
+  const results = {p1: {c: 2, s: 10}};
+  assert.equal(mergeResult(results, null), results);
+  assert.equal(mergeResult(results, {playerID: 'p1', c: 1, s: 99}), results);
+  assert.deepEqual(mergeResult(results, {playerID: 'p1', c: 3, s: 5}), {
+    p1: {c: 3, s: 5},
+  });
+  assert.deepEqual(mergeResult(results, {playerID: 'p2', c: 1, s: 7}), {
+    p1: {c: 2, s: 10},
+    p2: {c: 1, s: 7},
+  });
+});
+
+test('opponent IDs merge every source without the player or duplicates', () => {
+  assert.deepEqual(
+    mergeOpponentIDs('me', ['p1'], ['p2', 'p1'], ['me', 'p3', ''], null),
+    ['p1', 'p2', 'p3'],
+  );
 });
 
 test('saved contexts keep only the most recent 20', () => {
